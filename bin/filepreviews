@@ -1,0 +1,24 @@
+#!/usr/bin/env node
+'use strict';
+
+var FilePreviews = require('../lib/'),
+    program = require('commander'),
+    version = require('../package.json').version;
+
+program
+  .version(version);
+
+program
+  .option('--debug', 'Enable debug logging.')
+  .option('--version', 'Show version.');
+
+program
+  .command('*')
+  .action(function(url) {
+    var preview = new FilePreviews({debug: program.debug});
+    preview.generate(url, function(err, result) {
+      console.log(JSON.stringify(result, null, ' '));
+    });
+  });
+
+program.parse(process.argv);
