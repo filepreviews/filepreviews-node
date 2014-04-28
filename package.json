@@ -1,0 +1,16 @@
+{
+  "name": "filepreviews",
+  "version": "1.0.7",
+  "description": "Client library for FilePreviews.io - Generate image previews and metadata from almost any kind of file",
+  "main": "./src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/GetBlimp/filepreviews-node.git"
+  },
+  "scripts": {},
+  "author": "Giovanni Collazo (@gcollazo)",
+  "license": "MIT",
+  "dependencies": {
+    "request": "^2.34.0"
+  }
+}
