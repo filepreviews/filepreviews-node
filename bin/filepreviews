@@ -10,15 +10,34 @@ program
   .version(version);
 
 program
-  .option('--debug', 'Enable debug logging.')
-  .option('--version', 'Show version.');
+  .option('-D, --debug', 'Enable debug logging.')
+  .option('-V, --version', 'Show version.')
+  .option('-m, --metadata [values]', 'Eg: exif,ocr,psd,all')
+  .option('-h, --height [value]', 'Height value')
+  .option('-w, --width [value]', 'Width value');
 
 program
   .command('*')
   .action(function(fileURL) {
+    var options = {};
+
+    if (program.metadata) {
+      options.metadata = program.metadata.split(',');
+    }
+
+    if (program.height || program.width) {
+      options.size = {};
+      if (program.height) {
+        options.size.height = program.height;
+      }
+      if (program.width) {
+        options.size.width = program.width;
+      }
+    }
+
     if (url.isWebUri(fileURL)) {
       var preview = new FilePreviews({debug: program.debug});
-      preview.generate(fileURL, function(err, result) {
+      preview.generate(fileURL, options, function(err, result) {
         console.log(JSON.stringify(result, null, ' '));
       });
     } else {

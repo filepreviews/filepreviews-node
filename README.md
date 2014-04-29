@@ -8,7 +8,7 @@ This is a client library for the **Demo API** of [FilePreviews.io](http://filepr
 npm install filepreviews
 ```
 
-#### Example code
+### Example code
 ```js
 
 var FilePreviews = require('filepreviews'),
@@ -17,6 +17,25 @@ var FilePreviews = require('filepreviews'),
 previews.generate(url, function(err, result) {
   if (err) console.error(err);
 
+  console.log(result.previewURL);
+  console.log(result.metadata);
+});
+```
+
+#### Options
+You can optinally send an options object.
+```js
+var previews = new FilePreviews({debug: true});
+var options = {
+  size: {
+    width: 100,
+    height: 999,
+  },
+  // supported: 'exif', 'ocr', 'psd' or 'all' which means everything
+  metadata: ['exif', 'ocr', 'psd']
+}
+
+previews.generate(url, options, function(err, result) {
   console.log(result.previewURL);
   console.log(result.metadata);
 });
@@ -33,7 +52,7 @@ npm install -g filepreviews
 
 #### CLI Usage
 ```
-filepreviews [url]
+filepreviews [options] [url]
 ```
 
 #### Example
