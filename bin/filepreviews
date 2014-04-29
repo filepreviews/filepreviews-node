@@ -3,6 +3,7 @@
 
 var FilePreviews = require('../lib/'),
     program = require('commander'),
+    url = require('valid-url'),
     version = require('../package.json').version;
 
 program
@@ -14,11 +15,15 @@ program
 
 program
   .command('*')
-  .action(function(url) {
-    var preview = new FilePreviews({debug: program.debug});
-    preview.generate(url, function(err, result) {
-      console.log(JSON.stringify(result, null, ' '));
-    });
+  .action(function(fileURL) {
+    if (url.isWebUri(fileURL)) {
+      var preview = new FilePreviews({debug: program.debug});
+      preview.generate(fileURL, function(err, result) {
+        console.log(JSON.stringify(result, null, ' '));
+      });
+    } else {
+      console.error('Invalid URL');
+    }
   });
 
 program.parse(process.argv);
