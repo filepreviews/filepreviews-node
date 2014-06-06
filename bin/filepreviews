@@ -13,6 +13,7 @@ program
   .option('-D, --debug', 'Enable debug logging.')
   .option('-V, --version', 'Show version.')
   .option('-m, --metadata [values]', 'Eg: exif,ocr,psd,all')
+  .option('-f, --format [values]', 'Eg: png, jpg')
   .option('-h, --height [value]', 'Height value')
   .option('-w, --width [value]', 'Width value');
 
@@ -33,6 +34,10 @@ program
       if (program.width) {
         options.size.width = program.width;
       }
+    }
+
+    if (program.format) {
+      options.format = program.format;
     }
 
     if (url.isWebUri(fileURL)) {
