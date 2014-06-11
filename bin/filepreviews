@@ -12,6 +12,7 @@ program
 program
   .option('-D, --debug', 'Enable debug logging.')
   .option('-V, --version', 'Show version.')
+  .option('-K, --apiKey [key]', 'Use FilePreviews.io application API Key')
   .option('-m, --metadata [values]', 'Eg: exif,ocr,psd,all')
   .option('-f, --format [values]', 'Eg: png, jpg')
   .option('-h, --height [value]', 'Height value')
@@ -41,7 +42,11 @@ program
     }
 
     if (url.isWebUri(fileURL)) {
-      var preview = new FilePreviews({debug: program.debug});
+      var preview = new FilePreviews({
+        debug: program.debug,
+        apiKey: program.apiKey
+      });
+
       preview.generate(fileURL, options, function(err, result) {
         console.log(JSON.stringify(result, null, ' '));
       });
