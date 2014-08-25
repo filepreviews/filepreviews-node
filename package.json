@@ -1,6 +1,6 @@
 {
   "name": "filepreviews",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Client library for FilePreviews.io - Generate image previews and metadata from almost any kind of file",
   "main": "./lib/index.js",
   "repository": {
