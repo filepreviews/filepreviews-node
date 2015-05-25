@@ -22,8 +22,23 @@ previews.generate(url, function(err, result) {
 });
 ```
 
-#### Options
-You can optinally send an options object.
+#### Construction Options
+
+You can set options that control behavior
+
+```js
+var previews = new FilePreviews({
+  debug: true,        // logs more thing, default is false
+
+  apiKey: 'ABCDEF',   // your API key from filepreviews.io
+
+  timeout: 60 * 1000  // max time to wait for metadata before erroring
+                      // if not set, will keep retrying forever
+});
+```
+
+#### Preview Options
+You can optionally send an options object.
 ```js
 var previews = new FilePreviews({debug: true});
 var options = {
