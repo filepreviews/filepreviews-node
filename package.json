@@ -7,7 +7,10 @@
     "type": "git",
     "url": "git://github.com/GetBlimp/filepreviews-node.git"
   },
-  "scripts": {},
+  "scripts": {
+    "test": "mocha test",
+    "tdd": "mocha --watch test"
+  },
   "bin": {
     "filepreviews": "./bin/filepreviews"
   },
@@ -17,5 +20,8 @@
     "request": "^2.34.0",
     "commander": "^2.2.0",
     "valid-url": "^1.0.9"
+  },
+  "devDependencies": {
+    "mocha": "^2.2.5"
   }
 }
