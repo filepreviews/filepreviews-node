@@ -90,6 +90,99 @@ describe('Suite', function() {
     });
   });
 
+  describe('#request()', function() {
+    var fp;
+    before(function() {
+      fp = new FilePreviews({ apiKey: 'key', apiSecret: 'secret' });
+    });
+
+    it('should send auth information', function() {
+      fp._request = function(request, callback) {
+        assert.equal(request.auth.username, 'key');
+        assert.equal(request.auth.password, 'secret');
+      };
+
+      fp.request('http://example.com/');
+    });
+
+    it('should set GET as default method', function() {
+      fp._request = function(request, callback) {
+        assert.equal(request.method, 'GET');
+      };
+
+      fp.request('http://example.com/');
+    });
+
+    it('should accept method type in options', function() {
+      fp._request = function(request, callback) {
+        assert.equal(request.method, 'POST');
+      };
+
+      fp.request('http://example.com/', { method: 'POST' });
+    });
+
+    it('should accept data String in options', function() {
+      fp._request = function(request, callback) {
+        assert.equal(request.body, 'my-data');
+      };
+
+      fp.request('http://example.com//', { data: 'my-data' });
+    });
+
+    it('should accept data Object in options', function() {
+      fp._request = function(request, callback) {
+        assert.equal(request.body.foo, 'bar');
+      };
+
+      fp.request('http://example.com/', { data: { foo: 'bar' } });
+    });
+
+    it('should format request correctly', function() {
+      var url = 'http://example.com/one/two/three';
+
+      fp._request = function(request, callback) {
+        assert.equal(request.auth.username, 'key');
+        assert.equal(request.auth.password, 'secret');
+
+        assert.equal(request.method, 'POST');
+        assert.equal(request.json, true);
+
+        assert.equal(request.url, url);
+        assert.equal(request.body.foo, 'bar');
+      };
+      fp.request(url, {
+        method: 'POST',
+        data: { foo: 'bar'}
+      });
+    });
+
+    it('should handle success', function() {
+      fp._request = function(request, callback) {
+        var body = {
+          foo: 'bar'
+        };
+
+        callback(null, { statusCode: 200 }, body);
+      };
+
+      fp.request('http://example.com/', {}, function(err, response) {
+        assert.equal(err, null);
+        assert.equal(response.foo, 'bar');
+      });
+    });
+
+    it('should handle error', function() {
+      fp._request = function(request, callback) {
+        callback(null, { statusCode: 500 }, 'Server Error');
+      };
+
+      fp.request('http://example.com/', {}, function(err, response) {
+        assert.equal(err, 'Server Error');
+        assert.equal(response, null);
+      });
+    });
+  });
+
   describe('#generate()', function() {
     var fp;
     before(function() {
@@ -108,26 +201,42 @@ describe('Suite', function() {
 
         assert.equal(url[3], 'v2');
         assert.equal(url[4], 'previews');
+
+        assert.equal(request.body.url, 'http://example.com/my-file.doc');
       };
-      fp.generate('my-preview-id');
+      fp.generate('http://example.com/my-file.doc');
     });
 
     it('should handle success', function() {
+      var url = 'http://example.com/my-file.doc';
       fp._request = function(request, callback) {
-        callback(null, { statusCode: 200 }, 'Yei!');
+        var response = { statusCode: 200 };
+        var body = {
+          id: '1',
+          status: 'pending',
+          preview: null,
+          thumbnails: null,
+          original_file: null,
+          user_data: null,
+          url: url
+        };
+
+        callback(null, response, body);
       };
-      fp.retrieve('my-preview-id', function(err, result) {
+      fp.generate(url, function(err, result) {
         assert.equal(err, null);
-        assert.equal(result, 'Yei!');
+        assert.equal(result.id, '1');
+        assert.equal(result.status, 'pending');
+        assert.equal(result.url, url);
       });
     });
 
     it('should handle error', function() {
       fp._request = function(request, callback) {
-        callback('error', { statusCode: 400 }, 'Some Error');
+        callback('error', { statusCode: 500 }, 'Server Error');
       };
-      fp.retrieve('my-preview-id', function(err, result) {
-        assert.equal(err, 'Some Error');
+      fp.generate('my-preview-id', function(err, result) {
+        assert.equal(err, 'Server Error');
         assert.equal(result, null);
       });
     });
@@ -158,20 +267,67 @@ describe('Suite', function() {
 
     it('should handle success', function() {
       fp._request = function(request, callback) {
-        callback(null, { statusCode: 200 }, 'Yei!');
+        var request = { statusCode: 200 };
+        var body = {
+          status: 'success',
+          thumbnails: [{
+            url: 'http://example.com/user_manual_original_1.png',
+            requested_size: 'original',
+            resized: false,
+            original_size: {
+              width: '612',
+              height: '792'
+            },
+            page: 1,
+            size: {
+              width: '612',
+              height: '792'
+            }
+          }],
+          url: 'http://example.com/v2/previews/123/',
+          id: '123',
+          preview: {
+            url: 'http://example.com/user_manual_original_1.png',
+            requested_size: 'original',
+            resized: false,
+            original_size: {
+              width: '612',
+              height: '792'
+            },
+            page: 1,
+            size: {
+              width: '612',
+              height: '792'
+            }
+          },
+          user_data: null,
+          original_file: {
+            mimetype: 'application/pdf',
+            name: 'user_manual',
+            extension: 'pdf',
+            encoding: 'binary',
+            total_pages: 1,
+            metadata: {},
+            type: 'application',
+            size: 416905
+          }
+        };
+
+        callback(null, { statusCode: 200 }, body);
       };
       fp.retrieve('my-preview-id', function(err, result) {
         assert.equal(err, null);
-        assert.equal(result, 'Yei!');
+        assert.equal(result.status, 'success');
+        assert.equal(result.url, 'http://example.com/v2/previews/123/');
       });
     });
 
     it('should handle error', function() {
       fp._request = function(request, callback) {
-        callback('error', { statusCode: 400 }, 'Some Error');
+        callback('error', { statusCode: 500 }, 'Server Error');
       };
       fp.retrieve('my-preview-id', function(err, result) {
-        assert.equal(err, 'Some Error');
+        assert.equal(err, 'Server Error');
         assert.equal(result, null);
       });
     });
