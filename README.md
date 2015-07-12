@@ -1,4 +1,7 @@
 # FilePreviews.io
+
+[![Build Status](https://travis-ci.org/GetBlimp/filepreviews-node.svg)](https://travis-ci.org/GetBlimp/filepreviews-node)
+
 Node.js client library and CLI tool for the [FilePreviews.io](http://filepreviews.io) service. Generate image previews and metadata from almost any kind of file.
 
 ## Installation
