@@ -1,6 +1,4 @@
 #!/usr/bin/env node
-'use strict';
-
 var FilePreviews = require('../lib/'),
     program = require('commander'),
     url = require('valid-url'),
@@ -13,13 +11,14 @@ program
   .option('-D, --debug', 'Enable debug logging.')
   .option('-V, --version', 'Show version.')
   .option('-K, --apiKey [key]', 'Use FilePreviews.io application API Key')
+  .option('-S, --apiSecret [key]', 'Use FilePreviews.io application API Secret Key');
+
+program
+  .command('generate <url>')
   .option('-m, --metadata [values]', 'Eg: exif,ocr,psd,all')
   .option('-f, --format [values]', 'Eg: png, jpg')
   .option('-h, --height [value]', 'Height value')
-  .option('-w, --width [value]', 'Width value');
-
-program
-  .command('*')
+  .option('-w, --width [value]', 'Width value')
   .action(function(fileURL) {
     var options = {};
 
@@ -44,7 +43,8 @@ program
     if (url.isWebUri(fileURL)) {
       var preview = new FilePreviews({
         debug: program.debug,
-        apiKey: program.apiKey
+        apiKey: program.apiKey,
+        apiSecret: program.apiSecret
       });
 
       preview.generate(fileURL, options, function(err, result) {
@@ -53,6 +53,20 @@ program
     } else {
       console.error('Invalid URL');
     }
+  });
+
+program
+  .command('retrieve <preview_id>')
+  .action(function(previewId) {
+    var preview = new FilePreviews({
+      debug: program.debug,
+      apiKey: program.apiKey,
+      apiSecret: program.apiSecret
+    });
+
+    preview.retrieve(previewId, function(err, result) {
+      console.log(JSON.stringify(result, null, ' '));
+    });
   });
 
 program.parse(process.argv);
