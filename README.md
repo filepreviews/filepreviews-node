@@ -50,7 +50,8 @@ var options = {
     height: 250,
   },
   metadata: ['exif', 'ocr', 'psd'],
-  format: 'jpg'
+  format: 'jpg',
+  data: { foo: 'bar' }
 }
 
 previews.generate(url, options, function(err, result) {
